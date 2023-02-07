@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {Post} = require('../schemas/post.js');
-
+const mongoose = require('mongoose');
 //게시글 조회 API
 router.get('/posts', async (req, res)=> {
 
@@ -19,7 +19,7 @@ router.get('/posts', async (req, res)=> {
     }
     
 })
-//게시글 포스트 
+//게시글 포스트 API
 router.post('/posts', async(req, res)=> {
 
     try{
@@ -37,6 +37,21 @@ router.post('/posts', async(req, res)=> {
         return res.status(500).send({err: err.message})
     }
 
+})
+//게시글 상세 조회 by MongoDB 자체 Id 값
+router.get('/posts/:postId', async(req, res)=> {
+    
+    try{
+        const {postId} = req.params;
+        if(!mongoose
+            .isValidObjectId(postId)) 
+            return res.status(400).send({err: "invalid userId"})
+        const postedId = await Post.findOne({ _id: postId});
+        return res.send({postedId});
+    }catch(err){
+        console.log(err);
+        return res.status(500).send({err : err.message})
+    }
 })
 
 module.exports = router;
