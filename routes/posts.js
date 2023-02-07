@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 const {Post} = require('../schemas/post.js');
 
-//게시글 조회 {password 는 제외해야합니다.} => 아직못함
+//게시글 조회 API
 router.get('/posts', async (req, res)=> {
 
     try{
-        const foundedPosts = await Post.find();
-        foundedPosts.map(x => x.createdAt).sort() //만들어진 시간순 정렬
+        const foundedPosts = await 
+        Post
+        .find({})
+        .select('user title content createdAt'); // password 를 제외합니다.
+        foundedPosts.map(x => x.createdAt).sort() // 만들어진 시간순으로 정렬합니다.
         return res.send(foundedPosts);
 
     }catch(err){
