@@ -7,7 +7,8 @@ const PostSchema = new Schema({
         required: true },
     password: { 
         type: Number, 
-        required: true },
+        required: true,
+        unique: true },
     title:  {
         type: String, 
         required: true},

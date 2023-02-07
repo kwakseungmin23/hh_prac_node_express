@@ -19,7 +19,7 @@ router.get('/posts', async (req, res)=> {
     }
     
 })
-//게시글 포스트 API
+//게시글 포스트 API -> 비밀번호 unique 값이 먹히질 않는다. 새로 만들어야한다.
 router.post('/posts', async(req, res)=> {
 
     try{
@@ -45,7 +45,7 @@ router.get('/posts/:postId',async (req, res)=> {
         const { postId } = req.params;
         const result1 = await Post.find({});
         const result2 = result1.map((x) => {return x.password}); 
-        
+
         const detail = await Post.find({password: postId});
        
         for(i = 0; i< result2.length; i++){
@@ -60,14 +60,10 @@ router.get('/posts/:postId',async (req, res)=> {
     }
 })
 //게시글 수정하기
-router.put('/posts/:p', async(req, res)=> {
+router.put('/posts/:password', async(req, res)=> {
     try{
-        let data = await Post.updateOne(
-            req.params,
-            {$set: req.body}
-        );
+        let data = await Post.updateOne(req.params,{$set: req.body}, {new: true});
         res.send(data);
-
     }catch(err){
         console.log(err)
         return res.status(500).send({err: err.message})
