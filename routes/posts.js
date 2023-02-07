@@ -38,19 +38,39 @@ router.post('/posts', async(req, res)=> {
     }
 
 })
-//게시글 상세 조회 by MongoDB 자체 Id 값
-router.get('/posts/:postId', async(req, res)=> {
+//게시글 상세 조회 by password
+router.get('/posts/:postId',async (req, res)=> {
     
     try{
-        const {postId} = req.params;
-        if(!mongoose
-            .isValidObjectId(postId)) 
-            return res.status(400).send({err: "invalid userId"})
-        const postedId = await Post.findOne({ _id: postId});
-        return res.send({postedId});
+        const { postId } = req.params;
+        const result1 = await Post.find({});
+        const result2 = result1.map((x) => {return x.password}); 
+        
+        const detail = await Post.find({password: postId});
+       
+        for(i = 0; i< result2.length; i++){
+            if(result2[i] == Number(postId)){
+                return res.send({detail})}
+            else{
+                return res.status(400).send("There is no password")}
+        }
     }catch(err){
         console.log(err);
         return res.status(500).send({err : err.message})
+    }
+})
+//게시글 수정하기
+router.put('/posts/:p', async(req, res)=> {
+    try{
+        let data = await Post.updateOne(
+            req.params,
+            {$set: req.body}
+        );
+        res.send(data);
+
+    }catch(err){
+        console.log(err)
+        return res.status(500).send({err: err.message})
     }
 })
 
