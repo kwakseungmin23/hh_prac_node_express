@@ -1,18 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
-const Post = require('../schemas/post.js');
+const {Post} = require('../schemas/post.js');
 
 //게시글 조회 {password 는 제외해야합니다.} => 아직못함
 router.get('/posts', async (req, res)=> {
 
     try{
-        const posts = await Post.find({});
-    // posts 변수에 Post.find 몽구스 메서드를 사용한 결과.
-    // [
-    //  {user, password, title, content} 이렇게 온다.
-    // ]  
-    return res.send({posts:posts})
+        const foundedPosts = await Post.find();
+        foundedPosts.map(x => x.createdAt).sort() //만들어진 시간순 정렬
+        return res.send(foundedPosts);
+
     }catch(err){
         console.log(err)
         return res.status(500).send({err:err.message})
