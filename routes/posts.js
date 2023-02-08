@@ -50,17 +50,14 @@ router.get('/posts/:postId',async (req, res)=> {
     
     try{
         const { postId } = req.params;
-        const result1 = await Post.find({});
-        const result2 = result1.map((x) => {return x.password}); 
+        
+        const find = await Post.find({password: postId});
 
-        const detail = await Post.find({password: postId});
-       
-        for(i = 0; i< result2.length; i++){
-            if(result2[i] == Number(postId)){
-                return res.send({detail})}
-            else{
-                return res.status(400).send("There is no password")}
-        }
+        if(!find.length){
+            return res.status(400).send({err:"no password exisiting"})
+        }else {
+            res.send({find})};
+
     }catch(err){
         console.log(err);
         return res.status(500).send({err : err.message})
@@ -69,8 +66,16 @@ router.get('/posts/:postId',async (req, res)=> {
 //게시글 수정하기
 router.put('/posts/:password', async(req, res)=> {
     try{
-        let data = await Post.updateOne(req.params,{$set: req.body}, {new: true});
-        res.send(data);
+        const { password } = req.params;
+        const same  = await Post.find({password});
+        const Map = same.map(x => {return x.password});
+        for (let i = 0; i < Map.length; i++) {
+            if (Map[i] == password) {
+                let data = await Post
+                    .updateOne({password}, { $set: req.body }, { new: true });
+                res.send(data)
+            }
+        }
     }catch(err){
         console.log(err)
         return res.status(500).send({err: err.message})
