@@ -30,7 +30,7 @@ router.post('/comments/:postId', async (req,res)=> {
         return res.status(500).send({err: err.message});
     }
 })
-//Comment (댓글) GET API 
+//Comment (댓글) GET API , 같은 PW 의 모든 Comments 들을 GET 합니다.
 router.get('/comments/:postId', async ( req, res) => {
     try{
         
@@ -44,5 +44,25 @@ router.get('/comments/:postId', async ( req, res) => {
         return res.status(500).send({err:err.message});
     }
 })
+//Comment PUT API, Comment's content 수정 by mongoDB Unique _id value
+router.put('/comments/:postId', async (req, resp) => {
+    try{
+        const {postId} = req.params;
 
+        if(!mongoose.isValidObjectId(postId))
+        return resp.status(400).send({err: "invalid postId"})
+
+        const { content } = req.body;
+        if (!content) 
+        return resp.status(400).send({ err: "comment changing required" });
+
+        const update = await Comment
+        .findByIdAndUpdate(postId, { content }, {new: true});
+
+        resp.send({update});
+
+    }catch(err){
+
+    }
+})
 module.exports = router;
