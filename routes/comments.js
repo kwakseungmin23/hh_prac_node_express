@@ -5,7 +5,7 @@ const {Comment} = require('../schemas/comment.js');
 const {Post} = require('../schemas/post.js');
 
 //비밀번호 기준으로 개별 포스트 구별하고 Comment(댓글) POST API
-//하나의 게시글에 같은 password 부여 -> validation 확인 작업 필요
+//하나의 게시글에 같은 password 부여 -> validation 확인
 router.post('/comments/:postId', async (req,res)=> {
     try{
     
@@ -30,11 +30,13 @@ router.post('/comments/:postId', async (req,res)=> {
         return res.status(500).send({err: err.message});
     }
 })
+//Comment (댓글) GET API 
 router.get('/comments/:postId', async ( req, res) => {
     try{
         
         const {postId} = req.params;
-        const find = await Comment.find()
+        const comments = await Comment.find({password: postId});
+        res.send({comments})
 
 
     }catch(err){
