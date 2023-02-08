@@ -8,7 +8,7 @@ const connect = require('./schemas');
 connect();
 
 app.use(express.json());
-app.use('/api', postsRouter);
+app.use('/api', [postsRouter, commentsRouter]);
 
 app.get('/', (req, res) => {
     res.send('Bullet In Board Practicing');

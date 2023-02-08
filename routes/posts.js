@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {Post} = require('../schemas/post.js');
 const mongoose = require('mongoose');
+
+
 //게시글 조회 API
 router.get('/posts', async (req, res)=> {
 
