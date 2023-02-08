@@ -60,7 +60,7 @@ router.get('/posts/:postId',async (req, res)=> {
 
     }catch(err){
         console.log(err);
-        return res.status(500).send({err : err.message})
+        return res.status(500).send({err : err.message});
     }
 })
 //게시글 수정하기
@@ -73,13 +73,30 @@ router.put('/posts/:password', async(req, res)=> {
             if (Map[i] == password) {
                 let data = await Post
                     .updateOne({password}, { $set: req.body }, { new: true });
-                res.send(data)
+                res.send(data);
             }
         }
     }catch(err){
-        console.log(err)
-        return res.status(500).send({err: err.message})
+        console.log(err);
+        return res.status(500).send({err: err.message});
     }
 })
+//게시글 삭제
+router.delete('/posts/:password', async(req, res)=> {
+    try{
 
+        const {password} = req.params;
+        const find = await Post.find({password: password});
+        if(!find.length){
+            return res.status(400).send({err:"no password existing"});
+        }else {
+            await Post.deleteOne({password});
+        }
+        res.send({result:'success'});
+
+    }catch(err){
+        console.log(err);
+        return res.status(500).send({err:err.message});
+    }
+})
 module.exports = router;
