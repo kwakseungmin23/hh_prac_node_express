@@ -3,14 +3,15 @@ const {Schema, model} = require('mongoose');
 const commentSchema = new Schema({
     
     user: { 
-        type: String, 
-        required: true },
+        type: String,
+        required: true
+        },
 
     password: { 
         type: Number, 
-        required: true,
-        unique: true },
-        
+        required: true
+        },
+
     content: { 
         type: String, 
         required: true }
@@ -18,4 +19,3 @@ const commentSchema = new Schema({
 
 const Comment = model('Comments', commentSchema);
 module.exports = {Comment}
- 
