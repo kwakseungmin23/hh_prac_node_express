@@ -19,18 +19,25 @@ router.get('/posts', async (req, res)=> {
     }
     
 })
-//게시글 포스트 API -> 비밀번호 unique 값이 먹히질 않는다. 새로 만들어야한다.
+//게시글 포스트 API
 router.post('/posts', async(req, res)=> {
 
     try{
-        let {user, password, title, content} = req.body;
-        if(!user || !password || !title || !content) 
-        return res
-        .status(400)
-        .send({err:"user,password(num),title,content required"})
-        const post = new Post(req.body)
-        await post.save();
-        return res.send({ post })
+        const {user, password, title, content} = req.body;
+        const post = await Post.find({password});
+
+        if(post.length){
+            return res.status(400).json({
+                success: false,
+                errorMessage: 'Already Existing Password'
+            })
+        }
+
+        const createPost = await Post.create({
+            user, password, title, content
+        });
+
+        return res.json({ post: createPost });
 
     }catch(err){
         console.log(err)
