@@ -50,7 +50,7 @@ router.put('/comments/:postId', async (req, resp) => {
         const {postId} = req.params;
 
         if(!mongoose.isValidObjectId(postId))
-        return resp.status(400).send({err: "invalid postId"})
+        return resp.status(400).send({err: "invalid Id"})
 
         const { content } = req.body;
         if (!content) 
@@ -62,7 +62,23 @@ router.put('/comments/:postId', async (req, resp) => {
         resp.send({update});
 
     }catch(err){
+        console.log(err);
+        return res.status(500).send({err: err.message});
+    }
+})
+//Comment DELETE API, Deleting by own _id
+router.delete('/comments/:postId', async (req, res) => {
+    try{
+        
+        const {postId} = req.params;
+        if(!mongoose.isValidObjectId(postId))
+        return res.status(400).send({err: "invalid Id"})
+        const deleted = await Comment.findOneAndDelete({_id: postId});
+        return res.send({deleted});
 
+    }catch(err){
+        console.log(err);
+        return res.status(500).send({err: err.message});
     }
 })
 module.exports = router;
