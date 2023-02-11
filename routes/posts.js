@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Post } = require("../schemas/post.js");
 const auth_middleware = require("../middlewares/auth_middleware.js");
+const mongoose = require("mongoose");
 
 //게시글 조회 API
 router.get("/posts", async (req, res) => {
@@ -17,10 +18,11 @@ router.get("/posts", async (req, res) => {
   }
 });
 //게시글 포스트 API
-router.post("/posts", async (req, res) => {
+router.post("/posts", auth_middleware, async (req, res) => {
   try {
-    const { nickname, password, title, content } = req.body;
-    const post = await Post.find({ password });
+    const { userId } = res.locals.user;
+    const { name, title, content } = req.body;
+    const post = await Post.find({ _id: userId });
 
     if (post.length) {
       return res.status(400).json({
@@ -30,8 +32,7 @@ router.post("/posts", async (req, res) => {
     }
 
     const createPost = await Post.create({
-      nickname,
-      password,
+      name,
       title,
       content,
     });
@@ -60,38 +61,38 @@ router.get("/posts/:postId", async (req, res) => {
   }
 });
 //게시글 수정하기
-router.put("/posts/:password", auth_middleware, async (req, res) => {
+router.put("/posts/:postId", auth_middleware, async (req, res) => {
   try {
     const { userId } = res.locals.user;
-    const { password } = req.params;
-    const same = await Post.find({ password });
-    const Map = same.map((x) => {
-      return x.password;
-    });
-    for (let i = 0; i < Map.length; i++) {
-      if (Map[i] == password) {
-        let data = await Post.updateOne(
-          { password, userId },
-          { $set: req.body },
-          { new: true }
-        );
-        res.send(data);
+    const { postId } = req.params;
+    if (!mongoose.isValidObjectId(postId))
+      return res.status(400).send({ err: "invalid postId" });
+    const { content } = req.body;
+    let updatebody = {};
+    if (content) updatebody.content = content;
+    const post = await Post.updateOne(
+      { userId, postId },
+      { $set: { updatebody } },
+      {
+        new: true,
       }
-    }
+    );
+    return res.send({ post });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });
   }
 });
 //게시글 삭제
-router.delete("/posts/:password", async (req, res) => {
+router.delete("/posts/:password", auth_middleware, async (req, res) => {
   try {
     const { password } = req.params;
+    const { userId } = res.locals.user;
     const find = await Post.find({ password });
     if (!find.length) {
       return res.status(400).send({ err: "no password existing" });
     } else {
-      await Post.deleteOne({ password });
+      await Post.deleteOne({ password, userId });
     }
     res.send({ result: "success" });
   } catch (err) {
