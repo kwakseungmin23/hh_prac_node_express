@@ -42,10 +42,9 @@ router.post("/posts", auth_middleware, async (req, res) => {
   }
 });
 //게시글 상세 조회
-router.get("/posts/:postId", auth_middleware, async (req, res) => {
+router.get("/posts/:postId", async (req, res) => {
   try {
     const { postId } = req.params;
-    // const { userId } = res.locals.user;
     const posts = await Post.findOne({ _id: postId });
     return res.send({ posts });
   } catch (err) {
@@ -58,19 +57,15 @@ router.put("/posts/:postId", auth_middleware, async (req, res) => {
   try {
     const { userId } = res.locals.user;
     const { postId } = req.params;
-    if (!mongoose.isValidObjectId(postId))
-      return res.status(400).send({ err: "invalid postId" });
     const { content } = req.body;
-    let updatebody = {};
-    if (content) updatebody.content = content;
-    const post = await Post.updateOne(
-      { userId, postId },
-      { $set: { updatebody } },
-      {
-        new: true,
-      }
-    );
-    return res.send({ post });
+    const existPost = await Post.findOne({ _id: postId }); // 정상작동
+    if (existPost)
+      await Post.updateOne(
+        { userId },
+        { $set: { content: content } },
+        { new: true }
+      );
+    res.send();
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });
