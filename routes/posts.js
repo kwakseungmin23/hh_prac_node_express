@@ -41,18 +41,13 @@ router.post("/posts", auth_middleware, async (req, res) => {
     return res.status(500).send({ err: err.message });
   }
 });
-//게시글 상세 조회 by password
+//게시글 상세 조회
 router.get("/posts/:postId", auth_middleware, async (req, res) => {
   try {
     const { postId } = req.params;
-    const { userId } = res.locals.user;
-    const find = await Post.find({ [userId]: postId });
-
-    if (!find.length) {
-      return res.status(400).send({ err: "no password exisiting" });
-    } else {
-      res.send({ find });
-    }
+    // const { userId } = res.locals.user;
+    const posts = await Post.findOne({ _id: postId });
+    return res.send({ posts });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });
