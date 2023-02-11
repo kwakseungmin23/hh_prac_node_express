@@ -22,33 +22,31 @@ router.post("/posts", auth_middleware, async (req, res) => {
   try {
     const { userId } = res.locals.user;
     const { name, title, content } = req.body;
-    const post = await Post.find({ _id: userId });
-
-    if (post.length) {
+    const existPost = await Post.find({ userId });
+    if (existPost.length) {
       return res.status(400).json({
         success: false,
-        errorMessage: "Already Existing Password",
+        error: "Already Existing Post",
       });
     }
-
-    const createPost = await Post.create({
+    await Post.create({
       name,
       title,
       content,
+      userId,
     });
-
-    return res.json({ post: createPost });
+    return res.send("success");
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });
   }
 });
 //게시글 상세 조회 by password
-router.get("/posts/:postId", async (req, res) => {
+router.get("/posts/:postId", auth_middleware, async (req, res) => {
   try {
     const { postId } = req.params;
-
-    const find = await Post.find({ password: postId });
+    const { userId } = res.locals.user;
+    const find = await Post.find({ [userId]: postId });
 
     if (!find.length) {
       return res.status(400).send({ err: "no password exisiting" });
