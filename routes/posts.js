@@ -72,16 +72,12 @@ router.put("/posts/:postId", auth_middleware, async (req, res) => {
   }
 });
 //게시글 삭제
-router.delete("/posts/:password", auth_middleware, async (req, res) => {
+router.delete("/posts/:postId", auth_middleware, async (req, res) => {
   try {
-    const { password } = req.params;
+    const { postId } = req.params;
     const { userId } = res.locals.user;
-    const find = await Post.find({ password });
-    if (!find.length) {
-      return res.status(400).send({ err: "no password existing" });
-    } else {
-      await Post.deleteOne({ password, userId });
-    }
+    const find = await Post.findOne({ _id: postId });
+    if (find) await Post.deleteOne({ userId });
     res.send({ result: "success" });
   } catch (err) {
     console.log(err);
