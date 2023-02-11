@@ -1,22 +1,27 @@
-const {Schema, model} = require('mongoose');
+const { Schema, model } = require("mongoose");
 
-const PostSchema = new Schema({
-    
-    user: { 
-        type: String, 
-        required: true },
-    password: { 
-        type: Number, 
-        required: true,
-        },
-    title:  {
-        type: String
-        },
-    content: { 
-        type: String, 
-        required: true }
-    }, { timestamps: true })
+const PostSchema = new Schema(
+  {
+    nickname: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    title: {
+      type: String,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-const Post = model('Posts', PostSchema);
-module.exports = {Post}
- 
+const Post = model("Posts", PostSchema);
+module.exports = { Post };

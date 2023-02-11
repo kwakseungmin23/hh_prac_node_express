@@ -28,11 +28,9 @@ router.post("/signup", async (req, res) => {
         .send({ err: "Password should not include any of nickname stuffs." });
     }
   }
-
   const ExistUser = await userSchema.findOne({
     $or: [{ nickname }, { password }],
   });
-
   if (ExistUser) {
     if (ExistUser.nickname == nickname) {
       return res.status(400).send({ err: "nickname exist" });
