@@ -9,6 +9,7 @@ const PostSchema = new Schema(
     },
     password: {
       type: String,
+      Number,
       required: true,
       unique: true,
     },

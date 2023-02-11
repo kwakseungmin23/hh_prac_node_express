@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Post } = require("../schemas/post.js");
-const mongoose = require("mongoose");
+const auth_middleware = require("../middlewares/auth_middleware.js");
 
 //게시글 조회 API
 router.get("/posts", async (req, res) => {
@@ -60,8 +60,9 @@ router.get("/posts/:postId", async (req, res) => {
   }
 });
 //게시글 수정하기
-router.put("/posts/:password", async (req, res) => {
+router.put("/posts/:password", auth_middleware, async (req, res) => {
   try {
+    const { userId } = res.locals.user;
     const { password } = req.params;
     const same = await Post.find({ password });
     const Map = same.map((x) => {
@@ -70,7 +71,7 @@ router.put("/posts/:password", async (req, res) => {
     for (let i = 0; i < Map.length; i++) {
       if (Map[i] == password) {
         let data = await Post.updateOne(
-          { password },
+          { password, userId },
           { $set: req.body },
           { new: true }
         );
