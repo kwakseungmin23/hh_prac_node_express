@@ -2,21 +2,17 @@ const { Schema, model } = require("mongoose");
 
 const commentSchema = new Schema(
   {
-    nickname: {
+    name: {
       type: String,
       required: true,
-      unique: true,
+      unique: false,
     },
-
-    password: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
-
-    content: {
+    comment: {
       type: String,
       required: true,
+    },
+    userId: {
+      type: String,
     },
   },
   { timestamps: true }
