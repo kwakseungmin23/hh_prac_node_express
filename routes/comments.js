@@ -17,6 +17,7 @@ router.post("/comments/:postName", auth_middleware, async (req, res) => {
       await Comment.create({
         name,
         comment,
+        userId,
       });
     } else if (postName !== PostMap) {
       return res.status(400).send("There is no matching name");
@@ -28,38 +29,33 @@ router.post("/comments/:postName", auth_middleware, async (req, res) => {
   }
 });
 //Comment (댓글) GET API by checking name
-router.get("/comments/:postId", async (req, res) => {
+router.get("/comments/:postName", async (req, res) => {
   try {
-    const { postId } = req.params;
-    const comments = await Comment.find({ name: postId });
+    const { postName } = req.params;
+    const comments = await Comment.find({ name: postName });
     res.send({ comments });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });
   }
 });
-//Comment PUT API, Comment's content 수정 by mongoDB Unique _id value
-router.put("/comments/:postId", async (req, resp) => {
+//Comment PUT API, post's comment modifying.
+router.put("/comments/:postId", auth_middleware, async (req, res) => {
   try {
+    const { userId } = res.locals.user;
+    const { comment } = req.body;
     const { postId } = req.params;
-
-    if (!mongoose.isValidObjectId(postId))
-      return resp.status(400).send({ err: "invalid Id" });
-
-    const { content } = req.body;
-    if (!content)
-      return resp.status(400).send({ err: "comment changing required" });
-
-    const update = await Comment.findByIdAndUpdate(
-      postId,
-      { content },
-      { new: true }
-    );
-
-    resp.send({ update });
+    const existComment = await Comment.findOne({ _id: postId });
+    if (existComment)
+      await Comment.updateOne(
+        { userId },
+        { $set: { comment: comment } },
+        { new: true }
+      );
+    res.send();
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ err: err.message });
+    return resp.status(500).send({ err: err.message });
   }
 });
 //Comment DELETE API, Deleting by own _id
