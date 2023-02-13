@@ -14,11 +14,14 @@ router.post("/comments/:postName", auth_middleware, async (req, res) => {
     const foundPostBy = await Post.find({ userId });
     const PostMap = foundPostBy.map((e) => e.name).toString();
     if (postName == PostMap) {
-      await Comment.create({
-        name,
-        comment,
-        userId,
-      });
+      await Comment.create(
+        {
+          name,
+          comment,
+          userId,
+        },
+        { new: true }
+      );
     } else if (postName !== PostMap) {
       return res.status(400).send("There is no matching name");
     }
@@ -55,16 +58,19 @@ router.put("/comments/:postId", auth_middleware, async (req, res) => {
     res.send();
   } catch (err) {
     console.log(err);
-    return resp.status(500).send({ err: err.message });
+    return res.status(500).send({ err: err.message });
   }
 });
-//Comment DELETE API, Deleting by own _id
-router.delete("/comments/:postId", async (req, res) => {
+//Comment DELETE API
+router.delete("/comments/:postId", auth_middleware, async (req, res) => {
   try {
     const { postId } = req.params;
+    const { userId } = res.locals.user;
+
     if (!mongoose.isValidObjectId(postId))
       return res.status(400).send({ err: "invalid Id" });
-    const deleted = await Comment.findOneAndDelete({ _id: postId });
+    const findOne = await Comment.findOne({ _id: postId });
+    const deleted = await findOne.deleteOne({ userId });
     return res.send({ deleted });
   } catch (err) {
     console.log(err);
