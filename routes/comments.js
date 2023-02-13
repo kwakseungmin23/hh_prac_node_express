@@ -5,7 +5,7 @@ const auth_middleware = require("../middlewares/auth_middleware.js");
 const { Comment } = require("../schemas/comment.js");
 const { Post } = require("../schemas/post.js");
 
-//Comment(댓글) POST API => check userId => check name
+//Comment(댓글) POST API => check userId => check name => then Post
 router.post("/comments/:postName", auth_middleware, async (req, res) => {
   try {
     const { userId } = res.locals.user;
@@ -27,11 +27,11 @@ router.post("/comments/:postName", auth_middleware, async (req, res) => {
     return res.status(500).send({ err: err.message });
   }
 });
-//Comment (댓글) GET API , 같은 PW 의 모든 Comments 들을 GET 합니다.
+//Comment (댓글) GET API by checking name
 router.get("/comments/:postId", async (req, res) => {
   try {
     const { postId } = req.params;
-    const comments = await Comment.find({ password: postId });
+    const comments = await Comment.find({ name: postId });
     res.send({ comments });
   } catch (err) {
     console.log(err);
