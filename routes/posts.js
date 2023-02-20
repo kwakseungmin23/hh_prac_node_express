@@ -1,8 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const { Post } = require("../schemas/post.js");
+const { Router } = require("express");
+const postrouter = Router();
+const { Post } = require("../schemas/");
 const auth_middleware = require("../middlewares/auth_middleware.js");
-const mongoose = require("mongoose");
 
 //게시글 조회 API
 router.get("/posts", async (req, res) => {
@@ -84,4 +83,4 @@ router.delete("/posts/:postId", auth_middleware, async (req, res) => {
     return res.status(500).send({ err: err.message });
   }
 });
-module.exports = router;
+module.exports = { postrouter };

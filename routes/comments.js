@@ -1,5 +1,5 @@
-const express = require("express");
-const router = express.Router();
+const { Router } = require("express");
+const commentsRouter = Router();
 const mongoose = require("mongoose");
 const auth_middleware = require("../middlewares/auth_middleware.js");
 const { Comment } = require("../schemas/comment.js");
@@ -77,4 +77,4 @@ router.delete("/comments/:postId", auth_middleware, async (req, res) => {
     return res.status(500).send({ err: err.message });
   }
 });
-module.exports = router;
+module.exports = { commentsRouter };

@@ -1,9 +1,9 @@
-const express = require("express");
-const router = express.Router();
+const { Router } = require("express");
+const authRouter = Router();
 const User = require("../schemas/user");
 const jwt = require("jsonwebtoken");
 //log in API
-router.post("/login", async (req, res) => {
+authRouter.post("/login", async (req, res) => {
   const { nickname, password } = req.body;
   const user = await User.findOne({ nickname });
 
@@ -19,4 +19,4 @@ router.post("/login", async (req, res) => {
   res.status(200).json({ token });
 });
 
-module.exports = router;
+module.exports = { authRouter };
