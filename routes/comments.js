@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const commentsRouter = Router();
+const commentsRouter = Router({ mergeParams: true });
 const mongoose = require("mongoose");
 const auth_middleware = require("../middlewares/auth_middleware.js");
 const { Comment, Post } = require("../schemas");

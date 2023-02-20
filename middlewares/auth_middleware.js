@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const userSchema = require("../schemas/user");
+const { User } = require("../schemas");
 
 module.exports = async (req, res, next) => {
   const { Authorization } = req.cookies;
@@ -10,7 +10,7 @@ module.exports = async (req, res, next) => {
   }
   try {
     const { userId } = jwt.verify(authToken, "secret-key");
-    const user = await userSchema.findById(userId);
+    const user = await User.findById(userId);
     res.locals.user = user;
     next();
   } catch (err) {

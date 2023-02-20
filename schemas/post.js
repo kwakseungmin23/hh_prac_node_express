@@ -3,7 +3,6 @@ const {
   model,
   Types: { ObjectId },
 } = require("mongoose");
-const { commentSchema } = require("./comment");
 const PostSchema = new Schema(
   {
     user: {
@@ -22,10 +21,15 @@ const PostSchema = new Schema(
       type: String,
       required: true,
     },
-    comments: [commentSchema],
   },
   { timestamps: true }
 );
-
+PostSchema.virtual("comments", {
+  ref: "comment",
+  localField: "_id",
+  foreignField: "Post",
+});
+PostSchema.set("toObject", { virtuals: true });
+PostSchema.set("toJSON", { virtuals: true });
 const Post = model("Post", PostSchema);
 module.exports = { Post };

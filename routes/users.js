@@ -39,7 +39,7 @@ usersrouter.post("/login", async (req, res) => {
     });
   }
   const token = jwt.sign({ userId: user.userId }, "secret-key");
-  res.cookie("Authorization", `Bearer ${token}`); // bearer type - jwt type
+  res.cookie("Authorization", `Bearer ${token}`);
   res.status(200).json({ token });
 });
 
