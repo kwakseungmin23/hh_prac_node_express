@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
 const cookieparser = require("cookie-parser");
-const postsRouter = require("./routes/posts");
-const commentsRouter = require("./routes/comments");
-const usersRouter = require("./routes/users");
-const authRouter = require("./routes/auth");
+const {
+  postrouter,
+  commentsRouter,
+  usersrouter,
+  authRouter,
+} = require("./routes");
 const mongoose = require("mongoose");
 
 const MONGO_URI =
@@ -15,11 +17,15 @@ const server = async () => {
   try {
     await mongoose.connect(MONGO_URI);
     console.log("MongoDB connected");
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieparser());
-    app.use("/user", usersRouter);
-    app.use("/post", postsRouter);
+
+    app.use("/user", usersrouter);
+    app.use("/post", postrouter);
+    app.use("/comment", commentsRouter);
+    app.use("/auth", authRouter);
 
     app.listen(3000, () => {
       console.log(3000, "Server listening on port 3000");

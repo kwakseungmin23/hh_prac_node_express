@@ -1,9 +1,9 @@
-const express = require("express");
-const router = express.Router();
+const { Router } = require("express");
+const usersrouter = Router();
 const userSchema = require("../schemas/user");
 const authMiddleware = require("../middlewares/auth_middleware");
 //계정 정보 확인
-router.get("/signup/me", authMiddleware, async (req, res) => {
+usersrouter.get("/signup/me", authMiddleware, async (req, res) => {
   const { password, nickname } = res.locals.user;
   res.status(200).json({
     user: {
@@ -13,7 +13,7 @@ router.get("/signup/me", authMiddleware, async (req, res) => {
   });
 });
 //계정 가입
-router.post("/signup", async (req, res) => {
+usersrouter.post("/signup", async (req, res) => {
   const { nickname, password, confirmPw } = req.body;
   if (password !== confirmPw) {
     res.status(400).json({ err: "Password does not match." });
@@ -44,4 +44,4 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = { usersrouter };

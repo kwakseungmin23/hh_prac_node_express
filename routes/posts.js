@@ -4,7 +4,7 @@ const { Post } = require("../schemas/");
 const auth_middleware = require("../middlewares/auth_middleware.js");
 
 //게시글 조회 API
-router.get("/posts", async (req, res) => {
+postrouter.get("/posts", async (req, res) => {
   try {
     const foundedPosts = await Post.find({}).select(
       "nickname title content createdAt"
@@ -17,7 +17,7 @@ router.get("/posts", async (req, res) => {
   }
 });
 //게시글 포스트 API
-router.post("/posts", auth_middleware, async (req, res) => {
+postrouter.post("/posts", auth_middleware, async (req, res) => {
   try {
     const { userId } = res.locals.user;
     const { name, title, content } = req.body;
@@ -41,7 +41,7 @@ router.post("/posts", auth_middleware, async (req, res) => {
   }
 });
 //게시글 상세 조회
-router.get("/posts/:postId", async (req, res) => {
+postrouter.get("/posts/:postId", async (req, res) => {
   try {
     const { postId } = req.params;
     const posts = await Post.findOne({ _id: postId });
@@ -52,7 +52,7 @@ router.get("/posts/:postId", async (req, res) => {
   }
 });
 //게시글 수정하기
-router.put("/posts/:postId", auth_middleware, async (req, res) => {
+postrouter.put("/posts/:postId", auth_middleware, async (req, res) => {
   try {
     const { userId } = res.locals.user;
     const { postId } = req.params;
@@ -71,7 +71,7 @@ router.put("/posts/:postId", auth_middleware, async (req, res) => {
   }
 });
 //게시글 삭제
-router.delete("/posts/:postId", auth_middleware, async (req, res) => {
+postrouter.delete("/posts/:postId", auth_middleware, async (req, res) => {
   try {
     const { postId } = req.params;
     const { userId } = res.locals.user;
