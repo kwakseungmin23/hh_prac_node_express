@@ -57,8 +57,27 @@ commentsRouter.get("/", async (req, res) => {
     return res.status(500).send({ err: err.message });
   }
 });
-//Comment PUT API, post's comment modifying.
-commentsRouter.put("/:commentId");
+//Comment Patch API, post's comment modifying.
+commentsRouter.patch("/:commentsId", auth_middleware, async (req, res) => {
+  try {
+    const { commentsId } = req.params;
+    const { userId } = res.locals.user;
+    const { content } = req.body;
+    const [comment] = await Promise.all([
+      Comment.findOneAndUpdate({ _id: commentsId }, { content }, { new: true }),
+      Comment.updateOne(
+        { "comments._id": commentsId },
+        { user: userId },
+        { "comments.$.content": content } // 특정 comment의 특정 content 를 수정하는 문법.
+      ), // $ 를 이용해서 복잡한 문서를 손쉽게 업데이트 할 수 있다.
+    ]);
+
+    return res.send({ comment });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).send({ err: err.message });
+  }
+});
 //Comment DELETE API
 commentsRouter.delete("/:commentId", auth_middleware, async (req, res) => {
   try {
