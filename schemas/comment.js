@@ -14,11 +14,11 @@ const commentSchema = new Schema(
     post: {
       type: ObjectId,
       required: true,
-      ref: "post",
+      ref: "Post",
     },
   },
   { timestamps: true }
 );
 
-const Comment = model("Comments", commentSchema);
+const Comment = model("comment", commentSchema);
 module.exports = { Comment, commentSchema };

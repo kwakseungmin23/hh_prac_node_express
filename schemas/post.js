@@ -24,7 +24,7 @@ const PostSchema = new Schema(
   },
   { timestamps: true }
 );
-PostSchema.virtual("comments", {
+PostSchema.virtual("comment", {
   ref: "comment",
   localField: "_id",
   foreignField: "Post",

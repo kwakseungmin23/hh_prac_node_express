@@ -1,39 +1,48 @@
 const { Router } = require("express");
 const commentsRouter = Router({ mergeParams: true });
 const mongoose = require("mongoose");
+const { isValidObjectId } = require("mongoose");
 const auth_middleware = require("../middlewares/auth_middleware.js");
-const { Comment, Post } = require("../schemas");
+const { Comment, Post, User } = require("../schemas");
 
-//Comment(댓글) POST API => check userId => check name => then Post
-commentsRouter.post(
-  "/comments/:postName",
-  auth_middleware,
-  async (req, res) => {
-    try {
-      const { userId } = res.locals.user;
-      const { name, comment } = req.body;
-      const { postName } = req.params;
-      const foundPostBy = await Post.find({ userId });
-      const PostMap = foundPostBy.map((e) => e.name).toString();
-      if (postName == PostMap) {
-        await Comment.create(
-          {
-            name,
-            comment,
-            userId,
-          },
-          { new: true }
-        );
-      } else if (postName !== PostMap) {
-        return res.status(400).send("There is no matching name");
-      }
-      res.send();
-    } catch (err) {
-      console.log(err);
-      return res.status(500).send({ err: err.message });
+//Comment(댓글) POST API
+commentsRouter.post("/", auth_middleware, async (req, res) => {
+  try {
+    const { userId } = res.locals.user;
+    const { content } = req.body;
+    const { postId } = req.params;
+    if (!isValidObjectId(postId)) {
+      return res.status(400).send({ err: "blogId is invalid" });
     }
+    if (!isValidObjectId(userId)) {
+      return res.status(400).send({ err: "userId is invalid" });
+    }
+    if (typeof content !== "string") {
+      return res.status(400).send({ err: "content required" });
+    }
+    const [post, user] = await Promise.all([
+      Post.findById(postId),
+      User.findById(userId),
+    ]);
+    if (!post || !user)
+      return res.status(400).send({ err: "blog or user does not exist" });
+
+    const comment = new Comment({
+      content,
+      user,
+      post,
+    });
+    await Promise.all([
+      comment.save(),
+      Post.updateOne({ _id: postId }, { $push: { comments: comment } }),
+    ]);
+
+    return res.send({ comment });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ err: err.message });
   }
-);
+});
 //Comment (댓글) GET API by checking name
 commentsRouter.get("/comments/:postName", async (req, res) => {
   try {
