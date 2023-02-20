@@ -43,54 +43,36 @@ commentsRouter.post("/", auth_middleware, async (req, res) => {
     return res.status(500).send({ err: err.message });
   }
 });
-//Comment (댓글) GET API by checking name
-commentsRouter.get("/comments/:postName", async (req, res) => {
+//Comment (댓글) GET API
+commentsRouter.get("/", async (req, res) => {
   try {
-    const { postName } = req.params;
-    const comments = await Comment.find({ name: postName });
-    res.send({ comments });
+    const { postId } = req.params;
+    const comments = await Comment.find({ post: postId }).populate([
+      { path: "post", populate: { path: "user" } },
+      // { path: "user" },
+    ]);
+    return res.send({ comments });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });
   }
 });
 //Comment PUT API, post's comment modifying.
-commentsRouter.put("/comments/:postId", auth_middleware, async (req, res) => {
+commentsRouter.put("/:commentId");
+//Comment DELETE API
+commentsRouter.delete("/:commentId", auth_middleware, async (req, res) => {
   try {
+    const { commentId } = req.params;
     const { userId } = res.locals.user;
-    const { comment } = req.body;
-    const { postId } = req.params;
-    const existComment = await Comment.findOne({ _id: postId });
-    if (existComment)
-      await Comment.updateOne(
-        { userId },
-        { $set: { comment: comment } },
-        { new: true }
-      );
-    res.send();
+
+    if (!mongoose.isValidObjectId(commentId))
+      return res.status(400).send({ err: "invalid Id" });
+    const findOne = await Comment.findOne({ _id: commentId });
+    const deleted = await findOne.deleteOne({ userId });
+    return res.send({ deleted });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });
   }
 });
-//Comment DELETE API
-commentsRouter.delete(
-  "/comments/:postId",
-  auth_middleware,
-  async (req, res) => {
-    try {
-      const { postId } = req.params;
-      const { userId } = res.locals.user;
-
-      if (!mongoose.isValidObjectId(postId))
-        return res.status(400).send({ err: "invalid Id" });
-      const findOne = await Comment.findOne({ _id: postId });
-      const deleted = await findOne.deleteOne({ userId });
-      return res.send({ deleted });
-    } catch (err) {
-      console.log(err);
-      return res.status(500).send({ err: err.message });
-    }
-  }
-);
 module.exports = { commentsRouter };
