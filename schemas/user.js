@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: [/^[a-zA-Z0-9]{3,10}$/, "fill upperletter,SmallLetter,Number each"],
+    match: /[A-Za-z0-9]{3,}/g,
     minlength: 3,
   },
   password: {
@@ -13,13 +13,20 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 3,
   },
+  name: {
+    first: { type: String, required: true },
+    last: { type: String, required: false },
+  },
+  age: { Number, required: true },
+  email: { String, required: true, unique: true },
 });
 
 userSchema.virtual("userId").get(function () {
   return this._id.toHexString();
 });
 userSchema.set("toJSON", {
-  virtuals: true, // json 형태로 가공할때, userId를 가상 출력 시킨다.
+  virtuals: true,
 });
 
-module.exports = mongoose.model("User", userSchema);
+const User = model("user", userSchema);
+module.exports = { User };

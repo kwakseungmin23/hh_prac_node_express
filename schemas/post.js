@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
 const PostSchema = new Schema(
   {
@@ -9,13 +9,11 @@ const PostSchema = new Schema(
     },
     title: {
       type: String,
+      required: true,
     },
     content: {
       type: String,
       required: true,
-    },
-    userId: {
-      type: String,
     },
   },
   { timestamps: true }
