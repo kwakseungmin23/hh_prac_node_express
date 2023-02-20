@@ -1,47 +1,48 @@
 const { Router } = require("express");
 const usersrouter = Router();
-const userSchema = require("../schemas/user");
-const authMiddleware = require("../middlewares/auth_middleware");
-//계정 정보 확인
-usersrouter.get("/signup/me", authMiddleware, async (req, res) => {
-  const { password, nickname } = res.locals.user;
-  res.status(200).json({
-    user: {
-      password: password,
-      nickname: nickname,
-    },
-  });
-});
+const { User, Post, Comment, userSchema } = require("../schemas");
+const jwt = require("jsonwebtoken");
+
 //계정 가입
 usersrouter.post("/signup", async (req, res) => {
-  const { nickname, password, confirmPw } = req.body;
-  if (password !== confirmPw) {
-    res.status(400).json({ err: "Password does not match." });
+  try {
+    const { nickname, password, name, age, email } = req.body;
+    let NL = nickname.length;
+    let PL = password.length;
+    for (let i = 0; NL <= PL ? i < NL : i < PL; i++) {
+      if (nickname.includes(password.charAt([i])))
+        return res
+          .status(400)
+          .send("Password should not include any of nickname stuffs.");
+    }
+    if (!nickname) return res.status(400).send({ err: "nickname required" });
+    if (!password) return res.status(400).send({ err: "password required" });
+    if (!name || !name.first || !name.last)
+      return res.status(400).send({ err: "Both first & last names required." });
+
+    const user = new User({ ...req.body });
+    await user.save();
+    return res.send({ user });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ err: err.message });
+  }
+});
+//login API
+usersrouter.post("/login", async (req, res) => {
+  const { nickname, password } = req.body;
+  const user = await User.findOne({ nickname });
+
+  //이메일 일치하는 유저가 존재하지 않거나, 유저를 찾았지만 비밀번호와 입력 비밀번호가 다를때,
+  if (!user || user.password !== password) {
+    res.status(400).json({
+      err: "로그인 실패",
+    });
     return;
   }
-  let spl = nickname.split("");
-  let splPw = password.split("");
-  for (let i = 0; i < spl.length; i++) {
-    if (spl[i] == splPw[i]) {
-      return res
-        .status(400)
-        .send({ err: "Password should not include any of nickname stuffs." });
-    }
-  }
-  const ExistUser = await userSchema.findOne({
-    $or: [{ nickname }, { password }],
-  });
-  if (ExistUser) {
-    if (ExistUser.nickname == nickname) {
-      return res.status(400).send({ err: "nickname exist" });
-    } else if (ExistUser.password == password) {
-      res.status(400).send({ err: "password exist" });
-    }
-  } else if (!ExistUser) {
-    const user = new userSchema({ nickname, password });
-    await user.save();
-    return res.status(201).json({}); // 201 -> something created
-  }
+  const token = jwt.sign({ userId: user.userId }, "secret-key");
+  res.cookie("Authorization", `Bearer ${token}`); // bearer type - jwt type
+  res.status(200).json({ token });
 });
 
 module.exports = { usersrouter };

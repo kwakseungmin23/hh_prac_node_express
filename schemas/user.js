@@ -5,7 +5,6 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    match: /[A-Za-z0-9]{3,}/g,
     minlength: 3,
   },
   password: {
@@ -15,7 +14,7 @@ const userSchema = new Schema({
   },
   name: {
     first: { type: String, required: true },
-    last: { type: String, required: false },
+    last: { type: String, required: true },
   },
   age: { Number },
   email: { String },
@@ -29,4 +28,4 @@ userSchema.set("toJSON", {
 });
 
 const User = model("user", userSchema);
-module.exports = { User };
+module.exports = { User, userSchema };

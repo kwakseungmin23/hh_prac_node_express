@@ -1,8 +1,11 @@
 const { Router } = require("express");
 const postrouter = Router();
-const { Post } = require("../schemas/");
+const { isValidObjectId } = require("mongoose");
+const { Post, User } = require("../schemas/");
 const auth_middleware = require("../middlewares/auth_middleware.js");
+const { commentsRouter } = require("./comments");
 
+postrouter.use("/:postId/comments", commentsRouter);
 //게시글 조회 API
 postrouter.get("/posts", async (req, res) => {
   try {

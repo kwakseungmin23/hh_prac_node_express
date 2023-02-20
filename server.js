@@ -25,7 +25,6 @@ const server = async () => {
     app.use("/user", usersrouter);
     app.use("/post", postrouter);
     app.use("/comment", commentsRouter);
-    app.use("/auth", authRouter);
 
     app.listen(3000, () => {
       console.log(3000, "Server listening on port 3000");
