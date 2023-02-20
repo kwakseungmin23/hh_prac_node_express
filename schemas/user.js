@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    match: [/[A - z, 0 - 9]/, "fill upperletter,SmallLetter,Number each"],
+    match: [/^[a-zA-Z0-9]{3,10}$/, "fill upperletter,SmallLetter,Number each"],
     minlength: 3,
   },
   password: {
