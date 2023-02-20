@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   nickname: {
     type: String,
     required: true,
@@ -17,8 +17,8 @@ const userSchema = new mongoose.Schema({
     first: { type: String, required: true },
     last: { type: String, required: false },
   },
-  age: { Number, required: true },
-  email: { String, required: true, unique: true },
+  age: { Number },
+  email: { String },
 });
 
 userSchema.virtual("userId").get(function () {
