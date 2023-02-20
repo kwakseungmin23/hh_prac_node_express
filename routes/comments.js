@@ -68,10 +68,9 @@ commentsRouter.patch("/:commentsId", auth_middleware, async (req, res) => {
       Comment.updateOne(
         { "comments._id": commentsId },
         { user: userId },
-        { "comments.$.content": content } // 특정 comment의 특정 content 를 수정하는 문법.
+        { "comments.$.content": content } // 특정 comments의 특정 content 를 수정하는 문법.
       ), // $ 를 이용해서 복잡한 문서를 손쉽게 업데이트 할 수 있다.
     ]);
-
     return res.send({ comment });
   } catch (err) {
     console.log(err);
@@ -87,7 +86,7 @@ commentsRouter.delete("/:commentId", auth_middleware, async (req, res) => {
     if (!mongoose.isValidObjectId(commentId))
       return res.status(400).send({ err: "invalid Id" });
     const findOne = await Comment.findOne({ _id: commentId });
-    const deleted = await findOne.deleteOne({ userId });
+    const deleted = await findOne.deleteOne({ user: userId });
     return res.send({ deleted });
   } catch (err) {
     console.log(err);
