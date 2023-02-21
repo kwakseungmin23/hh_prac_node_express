@@ -11,7 +11,7 @@ postrouter.get("/", async (req, res) => {
   try {
     const Posts = await Post.find({}).populate([
       { path: "user" },
-      { path: "comments", populate: { path: "user" } },
+      { path: "comment", populate: { path: "user" } },
     ]);
     return res.send(Posts);
   } catch (err) {

@@ -18,11 +18,18 @@ const userSchema = new Schema({
   },
   age: { Number },
   email: { String },
+  isLike: { type: Boolean, required: true, default: false },
 });
 
-userSchema.virtual("userId").get(function () {
-  return this._id.toHexString();
-});
+userSchema
+  .virtual("userId", {
+    ref: "userId",
+    localField: "_id",
+    foreignField: "User",
+  })
+  .get(function () {
+    return this._id.toHexString();
+  });
 userSchema.set("toJSON", {
   virtuals: true,
 });
