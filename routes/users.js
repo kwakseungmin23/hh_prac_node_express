@@ -2,7 +2,9 @@ const { Router } = require("express");
 const usersrouter = Router();
 const { User, Post, Comment } = require("../schemas");
 const jwt = require("jsonwebtoken");
+const { likeRouter } = require("./likes");
 
+usersrouter.use("/:userId/likes", likeRouter);
 //계정 가입
 usersrouter.post("/signup", async (req, res) => {
   try {
@@ -42,25 +44,7 @@ usersrouter.post("/login", async (req, res) => {
   res.cookie("Authorization", `Bearer ${token}`);
   res.status(200).json({ token });
 });
-//좋아요
-usersrouter.patch("/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const { isLike } = req.body;
-    const user = await User.findByIdAndUpdate(
-      { _id: userId },
-      { isLike },
-      { new: true }
-    );
-    if (typeof isLike !== "boolean") {
-      return res.send("Like required typeof Boolean.");
-    }
-    return res.send({ user });
-  } catch (err) {
-    console.log(err);
-    return res.send({ err: err.message });
-  }
-});
+
 usersrouter.get("/:userId", async (req, res) => {
   const { userId } = req.params;
 });
