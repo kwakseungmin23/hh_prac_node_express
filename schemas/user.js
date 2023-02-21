@@ -1,11 +1,10 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 const { LikeSchema } = require("./like");
 
 const userSchema = new Schema({
   nickname: {
     type: String,
     required: true,
-    unique: true,
     minlength: 3,
   },
   password: {
@@ -22,18 +21,19 @@ const userSchema = new Schema({
   likes: [LikeSchema],
 });
 
-// userSchema
-//   .virtual("userId", {
-//     ref: "userId",
-//     localField: "_id",
-//     foreignField: "User",
-//   })
-//   .get(function () {
-//     return this._id.toHexString();
-//   });
-// userSchema.set("toJSON", {
-//   virtuals: true,
-// });
+userSchema
+  .virtual("like", {
+    ref: "Like",
+    localField: "likes",
+    foreignField: "name",
+  })
+  .get(function () {
+    return this._id.toHexString();
+  });
+userSchema.set("toJSON", {
+  virtuals: true,
+});
+LikeSchema.set("toObject", { virtuals: true });
 
 const User = model("user", userSchema);
 module.exports = { User, userSchema };

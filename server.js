@@ -12,7 +12,7 @@ const mongoose = require("mongoose");
 const MONGO_URI =
   "mongodb+srv://Seungmin_Kwak:rhkrtmdals98@cluster0.3hbka9r.mongodb.net/BulletIn";
 mongoose.set("strictQuery", false);
-mongoose.set("debug", false);
+mongoose.set("debug", true);
 const server = async () => {
   try {
     await mongoose.connect(MONGO_URI);

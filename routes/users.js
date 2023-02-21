@@ -8,7 +8,7 @@ usersrouter.use("/:userId/likes", likeRouter);
 //계정 가입
 usersrouter.post("/signup", async (req, res) => {
   try {
-    const { nickname, password, name, age, email, isLike } = req.body;
+    const { nickname, password, name, age, email } = req.body;
     let NL = nickname.length;
     let PL = password.length;
     for (let i = 0; NL <= PL ? i < NL : i < PL; i++) {
@@ -21,7 +21,6 @@ usersrouter.post("/signup", async (req, res) => {
     if (!password) return res.status(400).send({ err: "password required" });
     if (!name || !name.first || !name.last)
       return res.status(400).send({ err: "Both first & last names required." });
-
     const user = new User({ ...req.body });
     await user.save();
     return res.send({ user });
